@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="light" name="color-scheme"/>
+<title>LIDER-3D — SMM-отчёт | Октябрь 2026</title>
+<script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<style>
+    :root { --navy:#10283c; --ink:#172b3d; --muted:#657789; --mint:#0d9c91; --blue:#4577bd; --line:#dfe9ee; --bg:#f3f7f9; --white:#fff; --soft:#e9f7f5; --red:#b44d56; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+    .wrap { width:min(1180px,calc(100% - 40px)); margin:0 auto; }
+    header { background:var(--navy); color:white; padding:46px 0 40px; }
+    .eyebrow { color:#a9e2db; font-size:12px; text-transform:uppercase; font-weight:800; letter-spacing:.13em; }
+    h1 { font-size:clamp(27px,4.1vw,42px); letter-spacing:-.045em; margin:8px 0 12px; line-height:1.15; }
+    .subtitle { color:#bad0de; margin:0; font-size:14px; }
+    main { padding:32px 0 56px; }
+    section { margin-bottom:30px; }
+    h2 { font-size:20px; margin:0 0 15px; letter-spacing:-.02em; }
+    h3 { font-size:15px; margin:0 0 10px; }
+    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .card, .panel { background:var(--white); border:1px solid var(--line); border-radius:16px; box-shadow:0 4px 16px rgba(16,40,60,.025); }
+    .card { padding:20px; }
+    .card .label { color:var(--muted); font-size:12px; font-weight:700; }
+    .card .value { display:block; font-size:31px; line-height:1.15; letter-spacing:-.045em; font-weight:800; margin:9px 0 7px; font-variant-numeric:tabular-nums; }
+    .meta { color:var(--muted); font-size:12px; }
+    .up { color:#087b69; font-weight:800; }
+    .down { color:var(--red); font-weight:800; }
+    .panel { padding:20px; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .chart-box { min-height:260px; position:relative; }
+    .chart-note, .footnote { color:var(--muted); font-size:12px; margin:10px 0 0; }
+    .scroll { overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; background:white; font-size:13px; }
+    th { background:#eaf1f5; color:#526779; text-align:left; font-weight:800; font-size:12px; }
+    td,th { padding:11px 13px; border-bottom:1px solid var(--line); vertical-align:top; }
+    tr:last-child td { border-bottom:0; }
+    td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .small { font-size:12px; color:var(--muted); }
+    .pill { display:inline-block; background:var(--soft); color:#087b69; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:800; }
+    ul { margin:0; padding-left:18px; }
+    li { margin:7px 0; }
+    li strong { color:var(--navy); }
+    .split { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+    .note { padding:12px 15px; background:#eaf2f6; border-radius:10px; font-size:12px; color:#53697a; }
+    .accent { border-left:4px solid var(--mint); padding-left:12px; }
+    .compact td, .compact th { padding:9px 11px; }
+    footer { border-top:1px solid var(--line); padding:22px 0 34px; color:var(--muted); font-size:12px; }
+    @media(max-width:950px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.split{grid-template-columns:1fr}}
+    @media(max-width:570px){.wrap{width:calc(100% - 24px)}header{padding:32px 0}main{padding-top:22px}.kpis{gap:9px}.card{padding:14px}.card .value{font-size:24px}.panel{padding:14px}td,th{padding:9px 10px} .chart-box{min-height:230px}}
+    @media print {body{background:white}header{padding:22px 0;color:var(--navy);background:white;border-bottom:2px solid var(--navy)}.subtitle{color:var(--muted)}.eyebrow{color:var(--mint)}.card,.panel{box-shadow:none;break-inside:avoid}section{break-inside:avoid}main{padding:16px 0}footer{padding-bottom:0}}
+  
+/* Strong, restrained highlights for positive business results */
+.gain-card {
+  position:relative; overflow:hidden;
+  border-color:#8bd7c8;
+  background:linear-gradient(145deg,#ffffff 2%,#ebfcf7 100%);
+  box-shadow:0 7px 22px rgba(7,145,120,.09);
+  animation:gain-in .8s both;
+}
+.gain-card.featured {
+  background:linear-gradient(135deg,#073b47,#096c68);
+  border-color:#0ea89b;
+  color:white;
+  box-shadow:0 13px 30px rgba(5,106,103,.17);
+  animation:gain-in .7s both, feature-glow 3.8s ease-in-out infinite;
+}
+.gain-card.featured .gain-label,.gain-card.featured .meta,
+.gain-card.featured .headline-detail {color:#d8f8f0}
+.gain-card.featured .value {color:#93f9df}
+.gain-label {font-size:10px;letter-spacing:.08em;font-weight:900;color:#087b69}
+.growth-value {color:#087b69;font-weight:900!important}
+.gain-card .value,.impact-card .value {font-size:36px;letter-spacing:-.05em}
+.gain-card .meta strong {color:#087b69}
+.gain-card.featured .meta strong {color:#b7ffeb}
+.gain-card .spark {float:right;font-size:17px;font-weight:900}
+.gain-card .headline-detail,.impact-card .headline-detail {font-size:12px;font-weight:750;margin:0 0 8px}
+.impact-card {border:1px solid #a5c9ee;background:linear-gradient(135deg,#fff,#f0f8ff);animation:gain-in .8s .14s both}
+.impact-card .gain-label,.impact-card .value {color:#205d9d}
+.positive-row td:first-child {border-left:3px solid #21ad93}
+.competitor-panel {margin-bottom:14px}
+.section-topline {display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.compare-table .own-row {background:#edfaf6}
+.compare-table .own-row td:first-child {border-left:3px solid var(--mint)}
+.compare-table .own-row strong {color:#047d70}
+.metric-conclusion {border-left:3px solid #0d9c91;margin:12px 0 0;padding:3px 0 3px 11px;font-size:12px;color:#425f6b}
+.metric-conclusion strong {color:#087e71}
+@keyframes gain-in {from {opacity:0;transform:translateY(12px)}to {opacity:1;transform:translateY(0)}}
+@keyframes feature-glow {0%,100%{box-shadow:0 13px 30px rgba(5,106,103,.17)}50%{box-shadow:0 17px 40px rgba(7,185,154,.32)}}
+@media (prefers-reduced-motion:reduce){.gain-card,.impact-card,.gain-card.featured{animation:none!important}}
+@media print {.gain-card,.impact-card,.gain-card.featured{animation:none!important;box-shadow:none!important}.gain-card.featured{background:#0a605c!important;color:white!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media (max-width:570px){.gain-card .value,.impact-card .value {font-size:28px}.compare-table{min-width:570px}}
+
+/* CSS fallbacks keep charts visible if the Chart.js CDN is inaccessible. */
+.chart-box canvas{display:none}
+.charts-active .chart-box canvas{display:block}
+.chart-fallback{position:absolute;inset:10px 2px 3px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.charts-active .chart-fallback{display:none}
+.fallback-line{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:10px;font-size:12px}
+.fallback-label{color:#546b79;font-weight:650}
+.fallback-track{height:15px;border-radius:20px;background:#e4eef1;overflow:hidden}
+.fallback-fill{height:100%;border-radius:20px;background:#0d9c91}
+.fallback-line:nth-child(2) .fallback-fill{background:#4577bd}
+.fallback-line:nth-child(3) .fallback-fill{background:#9abfd6}
+.fallback-number{text-align:right;color:#087b69;font-weight:800}
+.fallback-stacked{height:38px;display:flex;border-radius:9px;overflow:hidden;flex-shrink:0}
+.fallback-stacked span{height:100%;display:block}
+.fallback-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:#546b79}
+.fallback-dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:7px}
+@media(max-width:570px){.fallback-line{grid-template-columns:84px 1fr 50px;gap:6px;font-size:11px}}
+
+/* Instagram Reels: featured outcome and portfolio distribution */
+.reels-feature-panel{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:18px}
+.reels-feature-main{border-radius:16px;background:linear-gradient(122deg,#0a4855 0%,#057e75 78%,#00aa91 100%);border:1px solid #119e92;color:#fff;padding:24px 26px;box-shadow:0 14px 28px rgba(0,109,104,.15);animation:gain-in .65s both}
+.reels-kicker{font-size:11px;font-weight:900;letter-spacing:.12em;color:#b4f9e8}
+.reels-hero-value{font-size:clamp(36px,5vw,54px);font-weight:900;letter-spacing:-.055em;line-height:1.14;margin:12px 0}
+.reels-hero-value span{font-size:14px;font-weight:650;letter-spacing:0;white-space:nowrap;color:#c9f5eb}
+.reels-hero-desc{font-size:14px;font-weight:750}
+.reels-hero-sub{font-size:12px;color:#d6fff5;margin-top:7px}
+.reels-side{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.reels-side-item{border:1px solid #b9ded7;background:linear-gradient(140deg,#fff,#ebfaf6);border-radius:14px;padding:16px}
+.reels-side-label{font-size:10px;color:#467d79;letter-spacing:.07em;font-weight:850}
+.reels-side-value{margin-top:9px;font-size:clamp(20px,2.5vw,26px);font-weight:900;color:#08796f;line-height:1.2;white-space:nowrap}
+.reels-chart-box{min-height:260px}
+.reels-highlight{color:#078e79;font-weight:950}
+@media(max-width:780px){.reels-feature-panel{grid-template-columns:1fr}}
+@media(max-width:570px){.reels-feature-main{padding:20px}.reels-side{gap:8px}.reels-side-item{padding:13px}.reels-side-value{font-size:20px}.reels-chart-box .fallback-line{grid-template-columns:47px 1fr 69px}}
+@media(prefers-reduced-motion:reduce){.reels-feature-main{animation:none}}
+@media print{.reels-feature-main{box-shadow:none;animation:none!important;background:#0a605c!important;color:white!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="eyebrow">LIDER-3D / маркетинг</div>
+<h1>Отчёт по SMM · Октябрь 2026</h1>
+<p class="subtitle">Срез на 29 октября · Собственные каналы, контент, конкуренты, план на 30.10–12.11</p>
+</div></header>
+<main class="wrap">
+<section aria-labelledby="summary">
+<h2 id="summary">01 / Основные результаты</h2>
+<div class="kpis"><div class="card gain-card featured">
+<div class="gain-label">ЛУЧШАЯ ДИНАМИКА · YOUTUBE <span class="spark">↗</span></div>
+<span class="value growth-value">+357%</span>
+<div class="headline-detail">385 217 просмотров за 28 дней</div>
+<div class="meta"><strong>+549 подписчиков</strong> · 5,3 тыс. часов просмотра</div>
+</div><div class="card gain-card">
+<div class="gain-label">INSTAGRAM · РОСТ АУДИТОРИИ <span class="spark">↗</span></div>
+<span class="value growth-value">+873</span>
+<div class="headline-detail">новых подписчика за 30 дней</div>
+<div class="meta"><strong>+60,8%</strong> к 28 сентября · <strong>288 939</strong> просмотров</div>
+</div><div class="card gain-card">
+<div class="gain-label">ВКОНТАКТЕ · ПРОСМОТРЫ <span class="spark">↗</span></div>
+<span class="value">209 960</span>
+<div class="headline-detail">просмотров контента за 1–29 октября</div>
+<div class="meta"><strong>+302 подписчика</strong> за период</div>
+</div><div class="card impact-card">
+<div class="gain-label">ВКОНТАКТЕ · ОБРАЩЕНИЯ <span class="spark">◆</span></div>
+<span class="value">58</span>
+<div class="headline-detail">обращений за октябрь</div>
+<div class="meta">Фактические входящие обращения</div>
+</div></div>
+<div class="panel scroll" style="margin-top:14px">
+<table aria-label="Показатели по соцсетям"><thead><tr><th>Площадка</th><th class="num">Подписчики</th><th>Просмотры / охват</th><th>Прирост / вовлечённость</th><th>Обращения</th></tr></thead>
+<tbody>
+<tr class="positive-row"><td><strong>YouTube</strong></td><td class="num">7 015</td><td>385 217 просмотров; 159,2 тыс. уникальных зрителей</td><td>+549 подписчиков; 5,3 тыс. часов просмотра</td><td>н/д</td></tr>
+<tr class="positive-row"><td><strong>Instagram</strong></td><td class="num">2 310</td><td>288 939 просмотров; 177 460 зрителей</td><td>+873 подписчика; 95,1% просмотров от неподписчиков</td><td>н/д</td></tr>
+<tr class="positive-row"><td><strong>ВКонтакте</strong></td><td class="num">9 017</td><td>209 960 просмотров контента</td><td>+302 подписчика; 3 782 лайка; 641 комментарий</td><td><strong>58</strong></td></tr>
+<tr><td><strong>Telegram</strong></td><td class="num">≈14 400</td><td>≈1 200 просмотров на пост</td><td>ERR ≈8,3%; средние просмотры на пост −35,7%</td><td>н/д</td></tr>
+<tr class="positive-row"><td><strong>MAX</strong></td><td class="num">4 282</td><td>26 924 просмотров 24 зафиксированных публикаций</td><td>Медиана 1 100 просмотров/пост</td><td>н/д</td></tr>
+
+</tbody>
+</table>
+<p class="footnote">Периоды: YouTube — 28 дней, Instagram — 30 дней, ВКонтакте — 1–29 октября. Срез Telegram и MAX — на 29 октября.</p>
+</div>
+</section>
+<section aria-labelledby="dynamics">
+<h2 id="dynamics">02 / Динамика и структура потребления</h2>
+<div class="two">
+<div class="panel"><h3>Чистый прирост подписчиков</h3><div class="chart-box"><canvas aria-label="Прирост: Instagram плюс 873, YouTube плюс 549, VK плюс 302" id="growthChart" role="img"></canvas><div aria-label="Прирост подписчиков по площадкам" class="chart-fallback">
+<div class="fallback-line"><span class="fallback-label">Instagram</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:100%"></span></span><span class="fallback-number">+873</span></div>
+<div class="fallback-line"><span class="fallback-label">YouTube</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:62.9%"></span></span><span class="fallback-number">+549</span></div>
+<div class="fallback-line"><span class="fallback-label">ВКонтакте</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:34.6%"></span></span><span class="fallback-number">+302</span></div>
+</div></div><p class="chart-note">Близкие, но не идентичные периоды: Instagram 30 дней, YouTube 28 дней, VK 01–29 октября. Для остальных каналов сопоставимого месячного прироста нет.</p></div>
+<div class="panel"><h3>ВКонтакте: структура просмотров</h3><div class="chart-box"><canvas aria-label="Клипы 108413, посты 80945, видео 16361, истории 4241" id="vkChart" role="img"></canvas><div aria-label="Структура просмотров VK" class="chart-fallback">
+<div class="fallback-stacked"><span style="width:51.63%;background:#0d9c91"></span><span style="width:38.55%;background:#4577bd"></span><span style="width:7.79%;background:#8db3d4"></span><span style="width:2.03%;background:#cbdce7"></span></div>
+<div class="fallback-legend">
+<div><i class="fallback-dot" style="background:#0d9c91"></i>Клипы — 51,6%</div>
+<div><i class="fallback-dot" style="background:#4577bd"></i>Посты — 38,6%</div>
+<div><i class="fallback-dot" style="background:#8db3d4"></i>Видео — 7,8%</div>
+<div><i class="fallback-dot" style="background:#cbdce7"></i>Истории — 2,0%</div>
+</div>
+</div></div><p class="chart-note">Всего 209 960 просмотров. На клипы приходится 51,6%; на посты — 38,6%.</p></div>
+</div>
+<div class="panel" style="margin-top:16px"><h3>MAX: результаты отдельных публикаций</h3><div class="chart-box" style="min-height:220px"><canvas aria-label="Розыгрыш пластика 3000, обзор Ender 5 Max 1400, юмор про пластик 1300, статья про DIY 3D-сканеры 1300" id="postChart" role="img"></canvas><div aria-label="Просмотры топ-4 постов MAX" class="chart-fallback">
+<div class="fallback-line"><span class="fallback-label">Розыгрыш</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:100%"></span></span><span class="fallback-number">3 000</span></div>
+<div class="fallback-line"><span class="fallback-label">Ender 5 Max</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:46.7%"></span></span><span class="fallback-number">1 400</span></div>
+<div class="fallback-line"><span class="fallback-label">Юмор</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:43.3%"></span></span><span class="fallback-number">1 300</span></div>
+<div class="fallback-line"><span class="fallback-label">DIY-сканеры</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:43.3%"></span></span><span class="fallback-number">1 300</span></div>
+</div></div><p class="chart-note">Просмотры из предоставленной выгрузки. Два материала делят третье место (по 1,3 тыс.).</p></div>
+</section>
+<section aria-labelledby="content">
+<h2 id="content">03 / Контент и публикации</h2>
+<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+<div class="card"><div class="label">Основные материалы</div><span class="value">17</span><div class="meta">Фактически опубликовано</div></div>
+<div class="card"><div class="label">В производстве</div><span class="value">5</span><div class="meta">Не учитывать как опубликованные</div></div>
+<div class="card"><div class="label">MAX</div><span class="value">24</span><div class="meta">Зафиксированные посты; часть — дистрибуция 17 материалов</div></div>
+</div>
+<div aria-label="Статистика Instagram Reels LIDER-3D" class="reels-feature-panel">
+<div class="reels-feature-main">
+<div class="reels-kicker">INSTAGRAM REELS / ЛУЧШИЙ РЕЗУЛЬТАТ</div>
+<div class="reels-hero-value">177 000 <span>просмотров</span></div>
+<div class="reels-hero-desc">Ролик №9 в переданной подборке</div>
+<div class="reels-hero-sub">Следующие результаты: <strong>43 600</strong> и <strong>28 000</strong></div>
+</div>
+<div class="reels-side">
+<div class="reels-side-item"><div class="reels-side-label">ВЫБОРКА</div><div class="reels-side-value">16 Reels</div></div>
+<div class="reels-side-item"><div class="reels-side-label">СУММА ПРОСМОТРОВ</div><div class="reels-side-value">280 661</div></div>
+<div class="reels-side-item"><div class="reels-side-label">МЕДИАНА НА РОЛИК</div><div class="reels-side-value">1 973</div></div>
+<div class="reels-side-item"><div class="reels-side-label">ДОЛЯ ТОП-3 В ПРОСМОТРАХ</div><div class="reels-side-value">88,6%</div></div>
+</div>
+</div>
+<div class="panel reels-chart-panel" style="margin-top:14px">
+<div class="section-topline"><h3>Наши Reels · 5 лучших результатов</h3><span class="small">Просмотры по предоставленному списку</span></div>
+<div class="chart-box reels-chart-box">
+<canvas aria-label="Ролик №9: 177000 просмотров, №7: 43600, №12: 28000, №15: 11200, №6: 6035" id="reelsChart" role="img"></canvas>
+<div aria-label="Пять лучших Reels" class="chart-fallback">
+<div class="fallback-line"><span class="fallback-label">№9</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:100%"></span></span><span class="fallback-number">177 тыс.</span></div>
+<div class="fallback-line"><span class="fallback-label">№7</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:24.6%"></span></span><span class="fallback-number">43,6 тыс.</span></div>
+<div class="fallback-line"><span class="fallback-label">№12</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:15.8%"></span></span><span class="fallback-number">28 тыс.</span></div>
+<div class="fallback-line"><span class="fallback-label">№15</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:6.3%"></span></span><span class="fallback-number">11,2 тыс.</span></div>
+<div class="fallback-line"><span class="fallback-label">№6</span><span class="fallback-track"><span class="fallback-fill" style="display:block;width:3.4%"></span></span><span class="fallback-number">6 035</span></div>
+</div>
+</div>
+<p class="metric-conclusion"><strong>Основной объём просмотров обеспечили три ролика:</strong> 248 600 из 280 661 в выборке. Типичный результат ниже пикового: медиана <strong>1 973 просмотра</strong> на Reel.</p>
+</div>
+
+<div class="split" style="margin-top:16px">
+<div class="panel"><h3>Топ публикаций с измеренными просмотрами <span class="pill">выборка MAX</span></h3>
+<div class="scroll"><table class="compact"><thead><tr><th>Материал</th><th class="num">Просмотры</th></tr></thead><tbody>
+<tr><td><strong>1. Осенний розыгрыш пластика</strong><div class="small">1 127 участников, по публикации</div></td><td class="num"><strong>3 000</strong></td></tr>
+<tr><td><strong>2. Обзор Ender 5 Max</strong></td><td class="num"><strong>1 400</strong></td></tr>
+<tr><td><strong>3. «Пластик LIDER-3D заходит в клуб»</strong><div class="small">На той же отметке — материал о DIY 3D-сканерах</div></td><td class="num"><strong>1 300</strong></td></tr>
+</tbody></table></div>
+<p class="footnote accent">Розыгрыш получил 2,7× медианных просмотров поста MAX (3 000 против 1 100). Конкретный приз и простая механика участия совпадают с максимальным результатом; причинную связь отдельно не измеряли.</p>
+</div>
+<div class="panel"><h3>Производственный портфель</h3><div class="scroll"><table class="compact"><thead><tr><th>Тип</th><th class="num">Материалов</th></tr></thead><tbody>
+<tr><td>Оборудование: Scanform X, Ender 5 Max, Flashforge, Bambu Lab, 3DeVOK</td><td class="num">10</td></tr>
+<tr><td>Обучение и пластик</td><td class="num">3</td></tr>
+<tr><td>Сезонный контент и юмор</td><td class="num">4</td></tr>
+</tbody></table></div>
+
+</div>
+</div>
+
+</section>
+<section aria-labelledby="competitors"><h2 id="competitors">04 / Конкуренты: цифры по площадкам</h2><div class="panel competitor-panel">
+<div class="section-topline"><h3>Telegram</h3><span class="small">Подписчики · средний охват поста · ERR</span></div>
+<div class="scroll"><table class="compare-table">
+<thead><tr><th>Канал</th><th class="num">Подписчики</th><th class="num">Просмотры / пост</th><th class="num">ERR</th></tr></thead>
+<tbody>
+<tr class="own-row"><td><strong>LIDER-3D</strong></td><td class="num">≈14 400</td><td class="num">≈1 200</td><td class="num">≈8,3%</td></tr>
+<tr><td><strong>3D-Outlet / @dddoutlet</strong></td><td class="num">127 384</td><td class="num">13 607</td><td class="num">10,7%</td></tr>
+<tr><td><strong>3DVision</strong></td><td class="num">826</td><td class="num">345</td><td class="num">41,8%</td></tr>
+<tr><td><strong>3DTool</strong></td><td class="num">754</td><td class="num">168</td><td class="num">22,3%</td></tr>
+</tbody>
+</table></div>
+<p class="metric-conclusion">3D-Outlet получает <strong>в 11,3 раза больше просмотров на пост</strong> при аудитории в 8,8 раза больше. У LIDER-3D ERR ниже, чем у всех трёх поименованных конкурентов в этой выборке.</p>
+</div><div class="panel competitor-panel">
+<div class="section-topline"><h3>ВКонтакте</h3><span class="small">Число подписчиков · просмотры отдельных клипов конкурентов</span></div>
+<div class="scroll"><table class="compare-table">
+<thead><tr><th>Сообщество</th><th class="num">Подписчики</th><th>Зафиксированные просмотры</th></tr></thead>
+<tbody>
+<tr class="own-row"><td><strong>LIDER-3D</strong></td><td class="num">9 017</td><td><strong>209 960</strong> просмотров контента за 01–29.10; из них 108 413 — клипы</td></tr>
+<tr><td><strong>3DIY Shop</strong></td><td class="num">31 746</td><td>Отдельные клипы: до <strong>37,1 тыс.</strong></td></tr>
+<tr><td><strong>Цветной мир</strong></td><td class="num">12 763</td><td>Примеры клипов: <strong>1–11 тыс.</strong></td></tr>
+<tr><td><strong>3D-Outlet</strong></td><td class="num">14 041</td><td>Примеры клипов: <strong>2,9–3,8 тыс.</strong></td></tr>
+<tr><td><strong>3DTool</strong></td><td class="num">14 770</td><td>Примеры клипов: <strong>158–449</strong></td></tr>
+<tr><td><strong>3DVision</strong></td><td class="num">3 137</td><td>Примеры клипов: <strong>293–793</strong></td></tr>
+</tbody>
+</table></div>
+<p class="metric-conclusion"><strong>3DIY Shop</strong> показал отдельный клип на <strong>37,1 тыс. просмотров</strong>. У LIDER-3D клипы принесли <strong>51,6%</strong> просмотров VK за период.</p>
+</div><div class="panel competitor-panel">
+<div class="section-topline"><h3>Instagram</h3><span class="small">Медиана просмотров выбранных Reels конкурентов</span></div>
+<div class="scroll"><table class="compare-table">
+<thead><tr><th>Аккаунт</th><th class="num">Подписчики</th><th class="num">Медиана Reels</th><th class="num">Максимум</th></tr></thead>
+<tbody>
+<tr class="own-row"><td><strong>LIDER-3D</strong></td><td class="num">2 310</td><td class="num"><strong>1 973</strong><span class="small"> · 16 Reels</span></td><td class="num"><strong class="reels-highlight">177 000</strong></td></tr>
+<tr><td><strong>3D-Outlet</strong></td><td class="num">101 000</td><td class="num"><strong>20 200</strong></td><td class="num">795 000</td></tr>
+<tr><td><strong>3DIY Shop</strong></td><td class="num">28 100</td><td class="num">5 253</td><td class="num">29 400</td></tr>
+<tr><td><strong>3DTool</strong></td><td class="num">14 300</td><td class="num">4 055</td><td class="num">41 200</td></tr>
+<tr><td><strong>Цветной мир</strong></td><td class="num">8 704</td><td class="num">2 370</td><td class="num">194 000</td></tr>
+<tr><td><strong>iGo3D Россия</strong></td><td class="num">3 038</td><td class="num">374</td><td class="num">515</td></tr>
+<tr><td><strong>3DVision</strong></td><td class="num">1 386</td><td class="num">—</td><td class="num">Нет Reels в выборке</td></tr>
+</tbody>
+</table></div>
+<p class="metric-conclusion"><strong>LIDER-3D:</strong> максимум <strong class="reels-highlight">177 тыс.</strong>, медиана <strong>1 973</strong>. У 3D-Outlet медиана <strong>20,2 тыс.</strong>, у 3DIY Shop — <strong>5,3 тыс.</strong>. Для LIDER-3D использованы 16 роликов, для конкурентов — предоставленные выборки.</p>
+</div><div class="panel competitor-panel">
+<div class="section-topline"><h3>MAX</h3><span class="small">Подписчики · медиана просмотров публикации</span></div>
+<div class="scroll"><table class="compare-table">
+<thead><tr><th>Канал</th><th class="num">Подписчики</th><th class="num">Медиана просмотров</th><th class="num">Просмотры / подписчики</th></tr></thead>
+<tbody>
+<tr class="own-row"><td><strong>LIDER-3D</strong></td><td class="num">4 282</td><td class="num"><strong>1 100</strong></td><td class="num">≈26%</td></tr>
+<tr><td><strong>3D-Outlet</strong></td><td class="num">1 363</td><td class="num">1 000</td><td class="num">≈73%</td></tr>
+<tr><td><strong>3DTool</strong></td><td class="num">45</td><td class="num">28</td><td class="num">≈62%</td></tr>
+</tbody>
+</table></div>
+<p class="metric-conclusion"><strong>LIDER-3D лидирует по размеру аудитории и абсолютной медиане просмотров:</strong> 4 282 подписчика и 1 100 просмотров против 1 363 и 1 000 у 3D-Outlet. По отношению просмотров к размеру аудитории 3D-Outlet выше.</p>
+</div></section>
+<section aria-labelledby="actions">
+<h2 id="actions">05 / Решения и задачи · 30 октября — 12 ноября</h2>
+<div class="two">
+<div class="panel"><h3>Подтверждённые результаты</h3><ul>
+<li><strong>YouTube:</strong> 385,2 тыс. просмотров за 28 дней; +357% к обычному уровню.</li>
+<li><strong>Instagram:</strong> +873 подписчика; 95,1% просмотров обеспечены неподписчиками.</li>
+<li><strong>VK:</strong> 58 обращений; 51,6% просмотров контента приходится на клипы.</li>
+<li><strong>MAX:</strong> розыгрыш — 3 тыс. просмотров против медианы 1,1 тыс.</li>
+
+</ul></div>
+<div class="panel"><h3>План с проверяемым результатом</h3><ul>
+<li><strong>Контент:</strong> выпустить 5 уже находящихся в работе материалов; отдельно измерить просмотры и обращения.</li>
+
+
+</ul></div>
+</div>
+</section>
+</main>
+<script>
+    window.addEventListener('load', function () {
+      if (typeof Chart === 'undefined') return;
+      document.documentElement.classList.add('charts-active');
+      Chart.defaults.font.family='-apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif';
+      Chart.defaults.color='#657789';
+      const grid={color:'#e7eef2'};
+      new Chart(document.getElementById('growthChart'),{
+        type:'bar',data:{labels:['Instagram','YouTube','ВКонтакте'],datasets:[{data:[873,549,302],backgroundColor:['#0d9c91','#4577bd','#9abfd6'],borderRadius:7,maxBarThickness:58}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'+'+c.parsed.y.toLocaleString('ru-RU')+' подписчиков'}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid,ticks:{precision:0}}}}
+      });
+      new Chart(document.getElementById('vkChart'),{
+        type:'doughnut',data:{labels:['Клипы','Посты','Видео','Истории'],datasets:[{data:[108413,80945,16361,4241],backgroundColor:['#0d9c91','#4577bd','#8db3d4','#cbdce7'],borderWidth:0,hoverOffset:4}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:9,padding:15}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed.toLocaleString('ru-RU')+' просмотров'}}}}
+      });
+      new Chart(document.getElementById('postChart'),{
+        type:'bar',data:{labels:['Розыгрыш пластика','Обзор Ender 5 Max','Юмор о пластике','DIY 3D-сканеры'],datasets:[{data:[3000,1400,1300,1300],backgroundColor:['#0d9c91','#4577bd','#83b3c6','#83b3c6'],borderRadius:6,maxBarThickness:28}]},
+        options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x.toLocaleString('ru-RU')+' просмотров'}}},scales:{x:{beginAtZero:true,grid},y:{grid:{display:false}}}}
+      });
+
+      new Chart(document.getElementById('reelsChart'),{
+        type:'bar',
+        data:{labels:['Ролик №9','Ролик №7','Ролик №12','Ролик №15','Ролик №6'],
+          datasets:[{data:[177000,43600,28000,11200,6035],
+            backgroundColor:['#0d9c91','#4577bd','#78aacc','#9bbdd6','#bdd3e4'],
+            borderRadius:6,maxBarThickness:34}]},
+        options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x.toLocaleString('ru-RU')+' просмотров'}}},
+          scales:{x:{beginAtZero:true,grid},y:{grid:{display:false}}}}
+      });
+    });
+</script>
+</body>
+</html>
